@@ -1,5 +1,6 @@
 package teamschwarz.pwsafe;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -12,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class EnterPassword extends Activity {
+public class MainActivity extends Activity {
 
     EditText masterPassword;
     Button accessButton;
@@ -32,14 +34,34 @@ public class EnterPassword extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_enter_password);
+        setContentView(R.layout.activity_main);
 
         masterPassword = (EditText) findViewById(R.id.editTextMasterPassword);
         accessButton = (Button) findViewById(R.id.buttonAccess);
-        newDescription = (EditText) findViewById(R.id.editTextDescription);
-        newPassword = (EditText) findViewById(R.id.editTextPassword);
-        saveButton = (Button) findViewById(R.id.buttonSavePassword);
+        newDescription = (EditText) findViewById(R.id.editTextNewDescription);
+        newPassword = (EditText) findViewById(R.id.editTextNewPassword);
+        saveButton = (Button) findViewById(R.id.buttonSave);
         passwordsListView = (ListView) findViewById(R.id.listViewPasswords);
+
+        final TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+
+        tabHost.setup();
+
+        TabHost.TabSpec tabSpec = tabHost.newTabSpec("Enter");
+        tabSpec.setContent(R.id.tabEnterPassword);
+        tabSpec.setIndicator("Enter");
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("View");
+        tabSpec.setContent(R.id.tabPasswordList);
+        tabSpec.setIndicator("View");
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("Add");
+        tabSpec.setContent(R.id.tabAddPassword);
+        tabSpec.setIndicator("Add");
+        tabHost.addTab(tabSpec);
+
 
         masterPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -61,9 +83,8 @@ public class EnterPassword extends Activity {
         accessButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Decoding passwords...", Toast.LENGTH_SHORT).show();
-
-                //Zur Übersichtsseite springen
+                tabHost.getTabWidget().setVisibility(View.VISIBLE);
+                tabHost.setCurrentTabByTag("View");
             }
         });
 
@@ -106,6 +127,8 @@ public class EnterPassword extends Activity {
             public void onClick(View v) {
                 PasswordItem passwortItem = new PasswordItem(newDescription.getText().toString(), newPassword.getText().toString());
                 passwords.add(passwortItem);
+                newDescription.setText("");
+                newPassword.setText("");
                 Toast.makeText(getApplicationContext(), "New password has been added", Toast.LENGTH_SHORT).show();
             }
         });
@@ -124,13 +147,13 @@ public class EnterPassword extends Activity {
 
     private class PasswordListAdapter extends ArrayAdapter<PasswordItem> {
         public PasswordListAdapter() {
-            super (EnterPassword.this, R.layout.activity_view_passwords, passwords);
+            super (MainActivity.this, R.layout.password_item, passwords);
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             if (view == null)
-                view = getLayoutInflater().inflate(R.layout.activity_view_passwords, parent, false);
+                view = getLayoutInflater().inflate(R.layout.password_item, parent, false);
 
             PasswordItem currentPassword = passwords.get(position);
 
@@ -147,7 +170,7 @@ public class EnterPassword extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_enter_password, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
