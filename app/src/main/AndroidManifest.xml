@@ -5,16 +5,29 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="PWSafe"
+        android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name="teamschwarz.pwsafe.MainActivity"
             android:label="PWSafe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="teamschwarz.pwsafe.PasswordlistActivity"
+            android:label="@string/app_name" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="teamschwarz.pwsafe.MainActivity" />
+        </activity>
+        <activity
+            android:name="teamschwarz.pwsafe.NewPasswordActivity"
+            android:label="@string/app_name" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="teamschwarz.pwsafe.PasswordlistActivity" />
         </activity>
     </application>
 
