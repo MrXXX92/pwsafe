@@ -12,6 +12,7 @@
             android:label="PWSafe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -28,6 +29,20 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="teamschwarz.pwsafe.PasswordlistActivity" />
+        </activity>
+        <activity
+            android:name="teamschwarz.pwsafe.SettingsActivity"
+            android:label="@string/app_name" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="teamschwarz.pwsafe.PasswordlistActivity" />
+        </activity>
+        <activity
+            android:name=".NewMPwActivity"
+            android:label="@string/app_name" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="teamschwarz.pwsafe.SettingsActivity" />
         </activity>
     </application>
 

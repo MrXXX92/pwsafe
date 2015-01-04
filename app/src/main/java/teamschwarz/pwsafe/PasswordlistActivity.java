@@ -3,6 +3,7 @@ package teamschwarz.pwsafe;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,8 +13,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
-
-//import android.support.v4.app.NavUtils;
 
 
 public class PasswordlistActivity extends Activity {
@@ -59,8 +58,6 @@ public class PasswordlistActivity extends Activity {
 
             TextView description = (TextView) view.findViewById(R.id.editTextItemDescription);
             description.setText(currentPassword.getDescription());
-            TextView password = (TextView) view.findViewById(R.id.editTextItemPassword);
-            password.setText(currentPassword.getPassword());
 
             return view;
         }
@@ -85,14 +82,14 @@ public class PasswordlistActivity extends Activity {
                 openNew();
                 return true;
             case R.id.action_settings:
-                //openSettings();
+                openSettings();
                 return true;
 
             // Respond to the action bar's Up/Home button
-            //TODO Up-Button funktioniert nicht
-            //case android.R.id.home:
-            //NavUtils.navigateUpFromSameTask(this);
-
+            case android.R.id.home:
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                NavUtils.navigateUpTo(this, upIntent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -103,4 +100,11 @@ public class PasswordlistActivity extends Activity {
         Intent intent = new Intent(this, NewPasswordActivity.class);
         startActivity(intent);
     }
+
+    private void openSettings() {
+        //neue Aktivität für Settings öffnen
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
 }

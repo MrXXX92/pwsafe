@@ -6,33 +6,29 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import java.util.ArrayList;
-import java.util.List;
 
 
-public class NewPasswordActivity extends Activity {
+public class NewMPwActivity extends Activity {
 
-    EditText newDescription;
-    EditText newPassword;
-    Button saveButton;
-    List<PasswordItem> passwords = new ArrayList<PasswordItem>();
+    private EditText masterPassword1;
+    private Button saveButton;
+    private EditText masterPassword2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_password);
+        setContentView(R.layout.activity_new_mpw);
 
         // Zurück-Button aktivieren
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        newDescription = (EditText) findViewById(R.id.editTextNewDescription);
-        newDescription.addTextChangedListener(new TextWatcher() {
+        masterPassword1 = (EditText) findViewById(R.id.editTextNew1);
+        masterPassword1.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -48,8 +44,8 @@ public class NewPasswordActivity extends Activity {
             }
         });
 
-        newPassword = (EditText) findViewById(R.id.editTextNewPassword);
-        newPassword.addTextChangedListener(new TextWatcher() {
+        masterPassword2 = (EditText) findViewById(R.id.editTextNew2);
+        masterPassword2.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -68,36 +64,27 @@ public class NewPasswordActivity extends Activity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PasswordItem passwortItem = new PasswordItem(newDescription.getText().toString(),
-                        newPassword.getText().toString());
-                passwords.add(passwortItem);
-                newDescription.setText("");
-                newPassword.setText("");
-                Toast.makeText(getApplicationContext(), "@strings/passwordUpdated", Toast.LENGTH_SHORT).show();
+                //TODO Masterpasswort ändern
+                masterPassword1.setText("");
+                masterPassword2.setText("");
+                Toast.makeText(getApplicationContext(), "@string/mpwUpdated", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private boolean isValidPasswordItem() {
-        return (String.valueOf(newDescription.getText()).trim().length() > 0) &&
-                (String.valueOf(newPassword.getText()).trim().length() > 0);
-    }
+        String new1 = String.valueOf(masterPassword1.getText());
+        String new2 = String.valueOf(masterPassword2.getText());
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_new_password, menu);
-        return true;
+        //Valide, wenn die beiden Passwörter gleich und nicht leer sind
+        return (new1.equals(new2) &&
+                (new1.trim().length() > 0));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks.
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                openSettings();
-                return true;
-
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 Intent upIntent = NavUtils.getParentActivityIntent(this);
@@ -106,11 +93,5 @@ public class NewPasswordActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void openSettings() {
-        //neue Aktivität für Settings öffnen
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
     }
 }
