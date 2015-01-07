@@ -67,7 +67,7 @@ public class NewMPwActivity extends Activity {
                 //TODO Masterpasswort ändern
                 masterPassword1.setText("");
                 masterPassword2.setText("");
-                Toast.makeText(getApplicationContext(), "@string/mpwUpdated", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.mpwUpdated, Toast.LENGTH_SHORT).show();
             }
         });
     }

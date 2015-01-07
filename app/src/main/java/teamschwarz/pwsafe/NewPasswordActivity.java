@@ -11,7 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class NewPasswordActivity extends Activity {
     EditText newPassword;
     Button saveButton;
     List<PasswordItem> passwords = new ArrayList<PasswordItem>();
+    int position = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +34,34 @@ public class NewPasswordActivity extends Activity {
         // Zurück-Button aktivieren
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //Aufruf verarbeiten
+        Intent intent = getIntent();
+        String title = intent.getStringExtra("title");
+        String description = intent.getStringExtra("description");
+        String password = intent.getStringExtra("password");
+        final int position = intent.getIntExtra("position", -1);
+
+        //Titel je nach Aufruf setzen (Neu oder Detail-Ansicht)
+        TextView titleView = (TextView) findViewById(R.id.textViewDetailTitle);
+        titleView.setText(title);
+
         newDescription = (EditText) findViewById(R.id.editTextNewDescription);
+        //falls eine Beschreibung übergeben wurde, diese auch anzeigen
+        if (description != null && !description.isEmpty()) {
+            newDescription.setText(description);
+        }
+
+        newPassword = (EditText) findViewById(R.id.editTextNewPassword);
+        //falls ein Passwort übergeben wurde, diese auch anzeigen
+        if (password != null && !password.isEmpty()) {
+            newPassword.setText(password);
+        }
+
+        //Save-Button Detail-Maske initial klickbar
+        saveButton = (Button) findViewById(R.id.buttonSave);
+        saveButton.setEnabled(isValidPasswordItem());
+
+
         newDescription.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -48,7 +78,6 @@ public class NewPasswordActivity extends Activity {
             }
         });
 
-        newPassword = (EditText) findViewById(R.id.editTextNewPassword);
         newPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -64,16 +93,31 @@ public class NewPasswordActivity extends Activity {
             }
         });
 
-        saveButton = (Button) findViewById(R.id.buttonSave);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PasswordItem passwortItem = new PasswordItem(newDescription.getText().toString(),
+                PasswordItem currentItem = new PasswordItem(newDescription.getText().toString(),
                         newPassword.getText().toString());
-                passwords.add(passwortItem);
-                newDescription.setText("");
-                newPassword.setText("");
-                Toast.makeText(getApplicationContext(), "@strings/passwordUpdated", Toast.LENGTH_SHORT).show();
+
+                if (position == -1l){
+                    //Keine Position übergeben -> neues Passwort
+                    // hinzufügen
+                    PasswordlistActivity.passwords.add(currentItem);
+                    //Felder leeren
+                    newDescription.setText("");
+                    newPassword.setText("");
+                    Toast.makeText(getApplicationContext(), R.string.password_added, Toast.LENGTH_SHORT).show();
+                } else {
+                    //bestehendes Passwort in der Bearbeitung
+                    // eingegebene Werte speichern
+                    PasswordItem listItem = PasswordlistActivity.passwords.get(position);
+                    listItem.setDescription(currentItem.getDescription());
+                    listItem.setPassword(currentItem.getPassword());
+                    //Felder leeren
+                    newDescription.setText("");
+                    newPassword.setText("");
+                    Toast.makeText(getApplicationContext(), R.string.password_updated, Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

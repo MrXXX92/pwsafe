@@ -24,9 +24,9 @@
         android:inputType="textPassword"
         android:ems="10"
         android:layout_marginTop="116dp"
-        android:layout_below="@+id/textViewEnterPassword"
-        android:layout_alignLeft="@+id/textViewEnterPassword"
-        android:layout_alignRight="@+id/textViewEnterPassword" />
+        android:layout_below="@id/textViewEnterPassword"
+        android:layout_alignLeft="@id/textViewEnterPassword"
+        android:layout_alignRight="@id/textViewEnterPassword" />
 
     <Button
         android:id="@+id/buttonAccess"

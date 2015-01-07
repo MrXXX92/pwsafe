@@ -10,7 +10,9 @@
     <string name="newMPW">new:</string>
     <string name="newMPWTitle">Enter a new master password</string>
     <string name="password">Password</string>
-    <string name="passwordUpdated">New password has been added</string>
+    <string name="passswordListTitle">Saved Passwords</string>
+    <string name="password_added">New Password has been added</string>
+    <string name="password_updated">Password has been updated</string>
     <string name="quality">Quality:</string>
     <string name="settings">Settings</string>
 

@@ -1,6 +1,6 @@
 package teamschwarz.pwsafe;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -11,13 +11,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class PasswordlistActivity extends Activity {
+public class PasswordlistActivity extends ListActivity {
 
-    List<PasswordItem> passwords = new ArrayList<PasswordItem>();
+    static List<PasswordItem> passwords = new ArrayList<PasswordItem>();
     ListView passwordsListView;
 
     @Override
@@ -28,13 +29,13 @@ public class PasswordlistActivity extends Activity {
         //Aufruf verarbeiten
         Intent intent = getIntent();
         String mpw = intent.getStringExtra(MainActivity.CURRENT_MPW);
-        // hier kann man dann was mit dem eingegebenen MasterPasswort machen
+        // TODO hier kann man dann was mit dem eingegebenen MasterPasswort machen
 
         // Zurück-Button aktivieren
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Liste der Passwörter anzeigen
-        passwordsListView = (ListView) findViewById(R.id.listViewPasswords);
+        passwordsListView = (ListView) findViewById(android.R.id.list);
 
         populatePasswordList();
     }
@@ -42,6 +43,13 @@ public class PasswordlistActivity extends Activity {
     private void populatePasswordList() {
         ArrayAdapter<PasswordItem> PasswordAdapter = new PasswordListAdapter();
         passwordsListView.setAdapter(PasswordAdapter);
+
+        //initial Testdaten einfügen
+        if (passwords.isEmpty()) {
+            passwords.add(new PasswordItem("testPW1", "pw1"));
+            passwords.add(new PasswordItem("testPW2", "pw2"));
+            passwords.add(new PasswordItem("testPW3", "pw3"));
+        }
     }
 
     private class PasswordListAdapter extends ArrayAdapter<PasswordItem> {
@@ -56,11 +64,17 @@ public class PasswordlistActivity extends Activity {
 
             PasswordItem currentPassword = passwords.get(position);
 
-            TextView description = (TextView) view.findViewById(R.id.editTextItemDescription);
+            TextView description = (TextView) view.findViewById(R.id.textViewItemDescription);
             description.setText(currentPassword.getDescription());
 
             return view;
         }
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        openDetail(position);
     }
 
     @Override
@@ -95,9 +109,21 @@ public class PasswordlistActivity extends Activity {
         }
     }
 
+    private void openDetail(int position) {
+        //neue Aktivität zur Ansicht eines PWs öffnen
+        Intent intent = new Intent(this, NewPasswordActivity.class);
+        PasswordItem pwClicked = passwords.get(position);
+        intent.putExtra("title", "Detail");
+        intent.putExtra("description", pwClicked.getDescription());
+        intent.putExtra("password", pwClicked.getPassword());
+        intent.putExtra("position", position);
+        startActivity(intent);
+    }
+
     private void openNew() {
         //neue Aktivität zum Hinzufügen eines PWs öffnen
         Intent intent = new Intent(this, NewPasswordActivity.class);
+        intent.putExtra("title", "New Password");
         startActivity(intent);
     }
 
