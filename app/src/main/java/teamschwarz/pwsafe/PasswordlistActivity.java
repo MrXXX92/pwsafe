@@ -115,6 +115,7 @@ public class PasswordlistActivity extends ListActivity {
         PasswordItem pwClicked = passwords.get(position);
         intent.putExtra("title", "Detail");
         intent.putExtra("description", pwClicked.getDescription());
+        intent.putExtra("username", pwClicked.getUsername());
         intent.putExtra("password", pwClicked.getPassword());
         intent.putExtra("position", position);
         startActivity(intent);
