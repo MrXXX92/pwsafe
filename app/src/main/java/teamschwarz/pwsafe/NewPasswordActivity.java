@@ -21,6 +21,7 @@ import java.util.List;
 public class NewPasswordActivity extends Activity {
 
     EditText newDescription;
+    EditText newUsername;
     EditText newPassword;
     Button saveButton;
     List<PasswordItem> passwords = new ArrayList<PasswordItem>();
@@ -38,6 +39,7 @@ public class NewPasswordActivity extends Activity {
         Intent intent = getIntent();
         String title = intent.getStringExtra("title");
         String description = intent.getStringExtra("description");
+        String username = intent.getStringExtra("username");
         String password = intent.getStringExtra("password");
         final int position = intent.getIntExtra("position", -1);
 
@@ -49,6 +51,12 @@ public class NewPasswordActivity extends Activity {
         //falls eine Beschreibung übergeben wurde, diese auch anzeigen
         if (description != null && !description.isEmpty()) {
             newDescription.setText(description);
+        }
+
+        newUsername = (EditText) findViewById(R.id.editTextNewUsername);
+        //falls eine Beschreibung übergeben wurde, diese auch anzeigen
+        if (username != null && !username.isEmpty()) {
+            newUsername.setText(username);
         }
 
         newPassword = (EditText) findViewById(R.id.editTextNewPassword);
@@ -63,6 +71,22 @@ public class NewPasswordActivity extends Activity {
 
 
         newDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Button nur klickbar, wenn das eingegebene Passwort valide ist
+                saveButton.setEnabled(isValidPasswordItem());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        newUsername.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -97,7 +121,7 @@ public class NewPasswordActivity extends Activity {
             @Override
             public void onClick(View v) {
                 PasswordItem currentItem = new PasswordItem(newDescription.getText().toString(),
-                        "ToDo: Hier den Usernamen aus dem zu erstellenden Edit Feld einfügen",
+                        newUsername.getText().toString(),
                         newPassword.getText().toString());
 
                 if (position == -1l){
@@ -106,9 +130,7 @@ public class NewPasswordActivity extends Activity {
                     PasswordlistActivity.passwords.add(currentItem);
                     //Felder leeren
                     newDescription.setText("");
-
-                    //ToDo: Feld für Username ebenfalls leeren
-
+                    newUsername.setText("");
                     newPassword.setText("");
                     Toast.makeText(getApplicationContext(), R.string.password_added, Toast.LENGTH_SHORT).show();
                 } else {
@@ -116,13 +138,11 @@ public class NewPasswordActivity extends Activity {
                     // eingegebene Werte speichern
                     PasswordItem listItem = PasswordlistActivity.passwords.get(position);
                     listItem.setDescription(currentItem.getDescription());
-                    listItem.setDescription(currentItem.getUsername());
+                    listItem.setUsername(currentItem.getUsername());
                     listItem.setPassword(currentItem.getPassword());
                     //Felder leeren
                     newDescription.setText("");
-
-                    //ToDo: Feld für Username ebenfalls leeren
-
+                    newUsername.setText("");
                     newPassword.setText("");
                     Toast.makeText(getApplicationContext(), R.string.password_updated, Toast.LENGTH_SHORT).show();
                 }
@@ -137,6 +157,7 @@ public class NewPasswordActivity extends Activity {
 
     private boolean isValidPasswordItem() {
         return (String.valueOf(newDescription.getText()).trim().length() > 0) &&
+                (String.valueOf(newUsername.getText()).trim().length() > 0)&&
                 (String.valueOf(newPassword.getText()).trim().length() > 0);
     }
 
