@@ -35,7 +35,7 @@ public class PasswordItem {
         return _username;
     }
 
-    public void setPUsername(String username){
+    public void setUsername(String username){
         this._username = username;
     }
 }
