@@ -6,10 +6,12 @@ package teamschwarz.pwsafe;
 public class PasswordItem {
 
     private String _description;
+    private String _username;
     private String _password;
 
-    public PasswordItem(String description, String password) {
+    public PasswordItem(String description, String username, String password) {
         _description = description;
+        _username = username;
         _password = password;
     }
 
@@ -27,5 +29,13 @@ public class PasswordItem {
 
     public void setPassword(String password){
         this._password = password;
+    }
+
+    public String getUsername() {
+        return _username;
+    }
+
+    public void setPUsername(String username){
+        this._username = username;
     }
 }

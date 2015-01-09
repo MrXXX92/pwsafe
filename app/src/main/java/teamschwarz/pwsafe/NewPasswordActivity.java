@@ -97,6 +97,7 @@ public class NewPasswordActivity extends Activity {
             @Override
             public void onClick(View v) {
                 PasswordItem currentItem = new PasswordItem(newDescription.getText().toString(),
+                        "ToDo: Hier den Usernamen aus dem zu erstellenden Edit Feld einfügen",
                         newPassword.getText().toString());
 
                 if (position == -1l){
@@ -105,6 +106,9 @@ public class NewPasswordActivity extends Activity {
                     PasswordlistActivity.passwords.add(currentItem);
                     //Felder leeren
                     newDescription.setText("");
+
+                    //ToDo: Feld für Username ebenfalls leeren
+
                     newPassword.setText("");
                     Toast.makeText(getApplicationContext(), R.string.password_added, Toast.LENGTH_SHORT).show();
                 } else {
@@ -112,12 +116,19 @@ public class NewPasswordActivity extends Activity {
                     // eingegebene Werte speichern
                     PasswordItem listItem = PasswordlistActivity.passwords.get(position);
                     listItem.setDescription(currentItem.getDescription());
+                    listItem.setDescription(currentItem.getUsername());
                     listItem.setPassword(currentItem.getPassword());
                     //Felder leeren
                     newDescription.setText("");
+
+                    //ToDo: Feld für Username ebenfalls leeren
+
                     newPassword.setText("");
                     Toast.makeText(getApplicationContext(), R.string.password_updated, Toast.LENGTH_SHORT).show();
                 }
+
+                //Der Einfachheit halber wird die XML-Datei bei jedem neuen Passwort komplett neu geschrieben
+                XMLParser.writeXML(PasswordlistActivity.passwords);
             }
         });
     }

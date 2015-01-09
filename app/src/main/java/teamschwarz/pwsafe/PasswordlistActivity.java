@@ -46,9 +46,9 @@ public class PasswordlistActivity extends ListActivity {
 
         //initial Testdaten einfügen
         if (passwords.isEmpty()) {
-            passwords.add(new PasswordItem("testPW1", "pw1"));
-            passwords.add(new PasswordItem("testPW2", "pw2"));
-            passwords.add(new PasswordItem("testPW3", "pw3"));
+            passwords.add(new PasswordItem("testPW1", "DummyUser1", "pw1"));
+            passwords.add(new PasswordItem("testPW2", "DummyUser2", "pw2"));
+            passwords.add(new PasswordItem("testPW3", "DummyUser3", "pw3"));
         }
     }
 

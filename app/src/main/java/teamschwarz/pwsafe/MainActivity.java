@@ -49,6 +49,10 @@ public class MainActivity extends Activity {
 
                 //... und der neuen Aktivität mitgeben
                 Intent intent = new Intent(MainActivity.this, PasswordlistActivity.class);
+
+                //Passwort Liste mit den Werten aus der XML-Datei befüllen
+                PasswordlistActivity.passwords = XMLParser.readXML();
+
                 intent.putExtra(CURRENT_MPW, password);
                 // TODO hier muss man sich das eingegebene MasterPasswort ggf. anders merken,
                 // um es später abgleichen & benutzen zu können
