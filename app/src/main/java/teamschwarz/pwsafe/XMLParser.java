@@ -30,16 +30,29 @@ public class XMLParser {
     static final String password = "password";
 
 
-    public static void writeXML(List<PasswordItem> passwords){
+    public static boolean writeXML(List<PasswordItem> passwords){
         try {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "PWSafe" + "/" + xmlFile);
-            if (!file.exists()){
-                file.createNewFile();
-            }
-            FileOutputStream fileos = new FileOutputStream (file);
-            //FileOutputStream fos = new  FileOutputStream(xmlFile);
-            //FileOutputStream fileos = getApplicationContext().openFileOutput(xmlFile, Context.MODE_PRIVATE);
+            String state = Environment.getExternalStorageState();
+            File file = null;
 
+            if(Environment.MEDIA_MOUNTED.equals(state)) {
+                File path = Environment.getExternalStorageDirectory();
+
+                if (!path.exists()) {
+                    path.mkdirs();
+                }
+                try {
+                    file = new File(path, xmlFile);
+                    file.createNewFile();
+                }
+                catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            FileOutputStream fileos = new FileOutputStream (file);
             XmlSerializer xmlSerializer = Xml.newSerializer();
             StringWriter writer = new StringWriter();
             xmlSerializer.setOutput(writer);
@@ -65,41 +78,36 @@ public class XMLParser {
             fileos.write(dataWrite.getBytes());
             fileos.close();
         }
-        catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         catch (IllegalArgumentException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }
         catch (IllegalStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     public static List<PasswordItem> readXML(){
         List<PasswordItem> userData = new ArrayList<PasswordItem>();
         String data = "";
         try {
-            FileInputStream fis = new FileInputStream(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "PWSafe" + "/" + xmlFile));
-            //FileInputStream fis = getApplicationContext().openFileInput(xmlFile);
-
+            File file = new File(Environment.getExternalStorageDirectory(), xmlFile);
+            FileInputStream fis = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(fis);
             char[] inputBuffer = new char[fis.available()];
             isr.read(inputBuffer);
             data = new String(inputBuffer);
             isr.close();
             fis.close();
-        }
-        catch (FileNotFoundException e3) {
-            // TODO Auto-generated catch block
-            e3.printStackTrace();
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
@@ -137,32 +145,34 @@ public class XMLParser {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
+        String lastTextElement = "";
+        PasswordItem pwi = new PasswordItem("", "", "");
         while (eventType != XmlPullParser.END_DOCUMENT){
-            if (eventType == XmlPullParser.START_DOCUMENT) {
-                System.out.println("Start document");
-            }
-            else if (eventType == XmlPullParser.START_TAG) {
-                System.out.println("Start tag "+xpp.getName());
-            }
-            else if (eventType == XmlPullParser.END_TAG) {
-                System.out.println("End tag "+xpp.getName());
-            }
-            else if(eventType == XmlPullParser.TEXT) {
-
-                //Erstmal ein Objekt mit leeren Strings erzeugen und Strings nachher füllen
-                PasswordItem pwi = new PasswordItem("", "", "");
-                if (xpp.getName() == description){
-                    pwi.setDescription(xpp.getText());
-                }
-                else if (xpp.getName() == userName){
-                    pwi.setDescription(xpp.getText());
-                }
-                else if (xpp.getName() == password){
-                    pwi.setDescription(xpp.getText());
-                }
-
-                //Der Liste das zuvor erstellte Objekt hinzufügen
-                userData.add(pwi);
+            String name = xpp.getName();
+            switch (eventType){
+                case XmlPullParser.START_TAG:
+                    if(name.equals("loginData")){
+                        pwi = new PasswordItem("", "", "");
+                    }
+                    break;
+                case XmlPullParser.TEXT:
+                    lastTextElement = xpp.getText();
+                    break;
+                case XmlPullParser.END_TAG:
+                    if(name.equals(description)){
+                        pwi.setDescription(lastTextElement);
+                    }
+                    else if(name.equals(userName)){
+                        pwi.setPUsername(lastTextElement);
+                    }
+                    else if(name.equals(password)){
+                        pwi.setPassword(lastTextElement);
+                    }
+                    else if(name.equals("loginData")){
+                        userData.add(pwi);
+                    }
+                    break;
             }
             try {
                 eventType = xpp.next();

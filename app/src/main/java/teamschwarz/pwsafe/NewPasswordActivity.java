@@ -128,7 +128,9 @@ public class NewPasswordActivity extends Activity {
                 }
 
                 //Der Einfachheit halber wird die XML-Datei bei jedem neuen Passwort komplett neu geschrieben
-                XMLParser.writeXML(PasswordlistActivity.passwords);
+                if (!XMLParser.writeXML(PasswordlistActivity.passwords)){
+                    Toast.makeText(getApplicationContext(), "Could not write file to external storage", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
