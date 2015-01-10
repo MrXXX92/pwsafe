@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,8 +15,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.util.EncodingUtils;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+
+import static teamschwarz.pwsafe.MainActivity.CURRENT_MPW;
 
 
 public class NewPasswordActivity extends Activity {
@@ -103,6 +116,23 @@ public class NewPasswordActivity extends Activity {
                 if (position == -1l){
                     //Keine Position übergeben -> neues Passwort
                     // hinzufügen
+                    try {
+                        Cipher cipher = Cipher.getInstance("AES");
+                        SecretKeySpec spec = new SecretKeySpec(CURRENT_MPW.getBytes(), "AES");
+                        cipher.init(Cipher.ENCRYPT_MODE, spec);
+                        currentItem.setPassword(cipher.doFinal(currentItem.getPassword().getBytes()).toString());
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchPaddingException e) {
+                        e.printStackTrace();
+                    } catch (InvalidKeyException e) {
+                        e.printStackTrace();
+                    } catch (BadPaddingException e) {
+                        e.printStackTrace();
+                    } catch (IllegalBlockSizeException e) {
+                        e.printStackTrace();
+                    }
+
                     PasswordlistActivity.passwords.add(currentItem);
                     //Felder leeren
                     newDescription.setText("");
