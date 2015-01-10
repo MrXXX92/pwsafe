@@ -164,7 +164,7 @@ public class XMLParser {
                         pwi.setDescription(lastTextElement);
                     }
                     else if(name.equals(userName)){
-                        pwi.setPUsername(lastTextElement);
+                        pwi.setUsername(lastTextElement);
                     }
                     else if(name.equals(password)){
                         pwi.setPassword(lastTextElement);
