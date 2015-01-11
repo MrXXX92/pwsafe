@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class NewPasswordActivity extends Activity {
@@ -24,6 +25,7 @@ public class NewPasswordActivity extends Activity {
     EditText newUsername;
     EditText newPassword;
     Button saveButton;
+    Button generateButton;
     List<PasswordItem> passwords = new ArrayList<PasswordItem>();
     int position = -1;
 
@@ -69,6 +71,8 @@ public class NewPasswordActivity extends Activity {
         saveButton = (Button) findViewById(R.id.buttonSave);
         saveButton.setEnabled(isValidPasswordItem());
 
+
+        generateButton = (Button) findViewById(R.id.buttonGenerate);
 
         newDescription.addTextChangedListener(new TextWatcher() {
             @Override
@@ -153,6 +157,15 @@ public class NewPasswordActivity extends Activity {
                 }
             }
         });
+
+        generateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String randomPassword = generateRandomPassword(true, true, true, 16);
+                newPassword.setText(randomPassword);
+                Toast.makeText(getApplicationContext(), "New password: " + randomPassword, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private boolean isValidPasswordItem() {
@@ -190,5 +203,52 @@ public class NewPasswordActivity extends Activity {
         //neue Aktivität für Settings öffnen
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+    }
+
+    private String generateRandomPassword(boolean useCharacters, boolean useDigits, boolean useSpecialSigns, int passwordLength){
+        //Arrays mit erlaubten Zeichen anlegen
+        int [] validCharacters = new int[52];
+        int [] validDigits = new int [10];
+
+        //Arrays mit den erlaubten Zeichen befüllen (ASCII-Code)
+        int [] validSpecialSigns = {33,35,36,37,38,63};
+
+        for (int i = 0; i < validCharacters.length; i++){
+            //Großbuchstaben
+            if (i < 26){
+                validCharacters[i] = i + 65;
+            }
+            //Kleinbuchstaben
+            else{
+                validCharacters[i] = i + 71;
+            }
+        }
+
+        for (int i = 0; i < validDigits.length; i++){
+            validDigits[i] = i + 48;
+        }
+
+        String password = "";
+        Random random = new Random();
+        for (int i = 0; i < passwordLength; i++){
+            int randomSignType = random.nextInt(3);
+            int randomIndex = 0;
+            switch(randomSignType){
+                case 0:
+                    randomIndex = random.nextInt(validCharacters.length);
+                    password += (char) validCharacters[randomIndex];
+                    break;
+                case 1:
+                    randomIndex = random.nextInt(validDigits.length);
+                    password += (char) validDigits[randomIndex];
+                    break;
+                case 2:
+                    randomIndex = random.nextInt(validSpecialSigns.length);
+                    password += (char) validSpecialSigns[randomIndex];
+                    break;
+            }
+        }
+
+        return password;
     }
 }
