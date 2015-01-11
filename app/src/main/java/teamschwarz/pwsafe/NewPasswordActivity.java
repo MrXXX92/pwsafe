@@ -1,6 +1,9 @@
 package teamschwarz.pwsafe;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -14,9 +17,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class NewPasswordActivity extends Activity {
 
@@ -24,8 +24,7 @@ public class NewPasswordActivity extends Activity {
     EditText newUsername;
     EditText newPassword;
     Button saveButton;
-    List<PasswordItem> passwords = new ArrayList<PasswordItem>();
-    int position = -1;
+    private Button copyButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,21 +53,22 @@ public class NewPasswordActivity extends Activity {
         }
 
         newUsername = (EditText) findViewById(R.id.editTextNewUsername);
-        //falls eine Beschreibung übergeben wurde, diese auch anzeigen
+        //falls ein Username übergeben wurde, diesen auch anzeigen
         if (username != null && !username.isEmpty()) {
             newUsername.setText(username);
         }
 
         newPassword = (EditText) findViewById(R.id.editTextNewPassword);
-        //falls ein Passwort übergeben wurde, diese auch anzeigen
+        //falls ein Passwort übergeben wurde, dieses auch anzeigen
         if (password != null && !password.isEmpty()) {
             newPassword.setText(password);
         }
 
-        //Save-Button Detail-Maske initial klickbar
+        //Save- und Copy-Button in Detail-Maske initial klickbar
         saveButton = (Button) findViewById(R.id.buttonSave);
         saveButton.setEnabled(isValidPasswordItem());
-
+        copyButton = (Button) findViewById(R.id.buttonCopy);
+        copyButton.setEnabled(isPasswordFilled());
 
         newDescription.addTextChangedListener(new TextWatcher() {
             @Override
@@ -109,7 +109,9 @@ public class NewPasswordActivity extends Activity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Buttons nur klickbar, wenn das eingegebene Passwort valide ist
                 saveButton.setEnabled(isValidPasswordItem());
+                copyButton.setEnabled(isPasswordFilled());
             }
 
             @Override
@@ -124,7 +126,7 @@ public class NewPasswordActivity extends Activity {
                         newUsername.getText().toString(),
                         newPassword.getText().toString());
 
-                if (position == -1l){
+                if (position == -1l) {
                     //Keine Position übergeben -> neues Passwort
                     // hinzufügen
                     PasswordlistActivity.passwords.add(currentItem);
@@ -148,17 +150,33 @@ public class NewPasswordActivity extends Activity {
                 }
 
                 //Der Einfachheit halber wird die XML-Datei bei jedem neuen Passwort komplett neu geschrieben
-                if (!XMLParser.writeXML(PasswordlistActivity.passwords)){
+                if (!XMLParser.writeXML(PasswordlistActivity.passwords)) {
                     Toast.makeText(getApplicationContext(), "Could not write file to external storage", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        copyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Aktuell eingegebenes Passwort kopieren
+                String password = newPassword.getText().toString();
+
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("password", password);
+                clipboard.setPrimaryClip(clip);
             }
         });
     }
 
     private boolean isValidPasswordItem() {
         return (String.valueOf(newDescription.getText()).trim().length() > 0) &&
-                (String.valueOf(newUsername.getText()).trim().length() > 0)&&
+                (String.valueOf(newUsername.getText()).trim().length() > 0) &&
                 (String.valueOf(newPassword.getText()).trim().length() > 0);
+    }
+
+    private boolean isPasswordFilled() {
+        return (String.valueOf(newPassword.getText()).trim().length() > 0);
     }
 
     @Override
