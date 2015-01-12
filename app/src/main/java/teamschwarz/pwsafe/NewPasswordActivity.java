@@ -175,7 +175,7 @@ public class NewPasswordActivity extends Activity {
         generateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String randomPassword = generateRandomPassword(true, true, true, 16);
+                String randomPassword = generateRandomPassword(16);
                 newPassword.setText(randomPassword);
                 Toast.makeText(getApplicationContext(), "New password: " + randomPassword, Toast.LENGTH_SHORT).show();
             }
@@ -223,7 +223,7 @@ public class NewPasswordActivity extends Activity {
         startActivity(intent);
     }
 
-    private String generateRandomPassword(boolean useCharacters, boolean useDigits, boolean useSpecialSigns, int passwordLength){
+    private String generateRandomPassword(int passwordLength){
         //Arrays mit erlaubten Zeichen anlegen
         int [] validCharacters = new int[52];
         int [] validDigits = new int [10];
