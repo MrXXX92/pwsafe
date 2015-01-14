@@ -20,6 +20,15 @@ public class PasswordlistActivity extends ListActivity {
 
     static List<PasswordItem> passwords = new ArrayList<PasswordItem>();
     ListView passwordsListView;
+    private String mpw;
+
+    public String getMpw(){
+        return mpw;
+    }
+
+    public void setMpw(final String mpw){
+        this.mpw = mpw;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +37,7 @@ public class PasswordlistActivity extends ListActivity {
 
         //Aufruf verarbeiten
         Intent intent = getIntent();
-        String mpw = intent.getStringExtra(MainActivity.CURRENT_MPW);
+        setMpw(intent.getStringExtra("CURRENT_MPW"));
         // TODO hier kann man dann was mit dem eingegebenen MasterPasswort machen
 
         // Zurück-Button aktivieren
@@ -115,8 +124,10 @@ public class PasswordlistActivity extends ListActivity {
         PasswordItem pwClicked = passwords.get(position);
         intent.putExtra("title", "Detail");
         intent.putExtra("description", pwClicked.getDescription());
+        intent.putExtra("username", pwClicked.getUsername());
         intent.putExtra("password", pwClicked.getPassword());
         intent.putExtra("position", position);
+        intent.putExtra("mpw", getMpw());
         startActivity(intent);
     }
 
@@ -124,6 +135,7 @@ public class PasswordlistActivity extends ListActivity {
         //neue Aktivität zum Hinzufügen eines PWs öffnen
         Intent intent = new Intent(this, NewPasswordActivity.class);
         intent.putExtra("title", "New Password");
+        intent.putExtra("mpw", getMpw());
         startActivity(intent);
     }
 

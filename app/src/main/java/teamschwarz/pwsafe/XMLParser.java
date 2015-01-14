@@ -16,8 +16,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 
 /**
  * Created by Mitsch on 09.01.15.
@@ -30,16 +36,29 @@ public class XMLParser {
     static final String password = "password";
 
 
-    public static void writeXML(List<PasswordItem> passwords){
+    public static boolean writeXML(List<PasswordItem> passwords, final String masterpw){
         try {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "PWSafe" + "/" + xmlFile);
-            if (!file.exists()){
-                file.createNewFile();
-            }
-            FileOutputStream fileos = new FileOutputStream (file);
-            //FileOutputStream fos = new  FileOutputStream(xmlFile);
-            //FileOutputStream fileos = getApplicationContext().openFileOutput(xmlFile, Context.MODE_PRIVATE);
+            String state = Environment.getExternalStorageState();
+            File file = null;
 
+            if(Environment.MEDIA_MOUNTED.equals(state)) {
+                File path = Environment.getExternalStorageDirectory();
+
+                if (!path.exists()) {
+                    path.mkdirs();
+                }
+                try {
+                    file = new File(path, xmlFile);
+                    file.createNewFile();
+                }
+                catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            FileOutputStream fileos = new FileOutputStream (file);
             XmlSerializer xmlSerializer = Xml.newSerializer();
             StringWriter writer = new StringWriter();
             xmlSerializer.setOutput(writer);
@@ -54,7 +73,19 @@ public class XMLParser {
                 xmlSerializer.text(passwords.get(i).getUsername());
                 xmlSerializer.endTag(null, userName);
                 xmlSerializer.startTag(null, password);
-                xmlSerializer.text(passwords.get(i).getPassword());
+                //13.01.2015 19:20 Lukas: Verschlüsselung des Passwortes
+                String encryptedTextString = "";
+                try {
+                    System.out.println("Masterpasswort: " + masterpw);
+                    System.out.println("Entschlüsselt: " + passwords.get(i).getPassword());
+                    Cipher enc = getCipher(Cipher.ENCRYPT_MODE, masterpw);
+                    byte encryptedText[] = enc.doFinal(passwords.get(i).getPassword().getBytes("UTF-8"));
+                    encryptedTextString = new String(encryptedText);
+                    System.out.println("Verschlüsselt: " + encryptedTextString);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                xmlSerializer.text(new String(encryptedTextString));
                 xmlSerializer.endTag(null, password);
                 xmlSerializer.endTag(null, "loginData");
             }
@@ -65,41 +96,36 @@ public class XMLParser {
             fileos.write(dataWrite.getBytes());
             fileos.close();
         }
-        catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         catch (IllegalArgumentException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }
         catch (IllegalStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
-    public static List<PasswordItem> readXML(){
+    public static List<PasswordItem> readXML(final String masterPw){
         List<PasswordItem> userData = new ArrayList<PasswordItem>();
         String data = "";
         try {
-            FileInputStream fis = new FileInputStream(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "PWSafe" + "/" + xmlFile));
-            //FileInputStream fis = getApplicationContext().openFileInput(xmlFile);
-
+            File file = new File(Environment.getExternalStorageDirectory(), xmlFile);
+            FileInputStream fis = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(fis);
             char[] inputBuffer = new char[fis.available()];
             isr.read(inputBuffer);
             data = new String(inputBuffer);
             isr.close();
             fis.close();
-        }
-        catch (FileNotFoundException e3) {
-            // TODO Auto-generated catch block
-            e3.printStackTrace();
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
@@ -137,32 +163,43 @@ public class XMLParser {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
+        String lastTextElement = "";
+        PasswordItem pwi = new PasswordItem("", "", "");
         while (eventType != XmlPullParser.END_DOCUMENT){
-            if (eventType == XmlPullParser.START_DOCUMENT) {
-                System.out.println("Start document");
-            }
-            else if (eventType == XmlPullParser.START_TAG) {
-                System.out.println("Start tag "+xpp.getName());
-            }
-            else if (eventType == XmlPullParser.END_TAG) {
-                System.out.println("End tag "+xpp.getName());
-            }
-            else if(eventType == XmlPullParser.TEXT) {
-
-                //Erstmal ein Objekt mit leeren Strings erzeugen und Strings nachher füllen
-                PasswordItem pwi = new PasswordItem("", "", "");
-                if (xpp.getName() == description){
-                    pwi.setDescription(xpp.getText());
-                }
-                else if (xpp.getName() == userName){
-                    pwi.setDescription(xpp.getText());
-                }
-                else if (xpp.getName() == password){
-                    pwi.setDescription(xpp.getText());
-                }
-
-                //Der Liste das zuvor erstellte Objekt hinzufügen
-                userData.add(pwi);
+            String name = xpp.getName();
+            switch (eventType){
+                case XmlPullParser.START_TAG:
+                    if(name.equals("loginData")){
+                        pwi = new PasswordItem("", "", "");
+                    }
+                    break;
+                case XmlPullParser.TEXT:
+                    lastTextElement = xpp.getText();
+                    break;
+                case XmlPullParser.END_TAG:
+                    if(name.equals(description)){
+                        pwi.setDescription(lastTextElement);
+                    }
+                    else if(name.equals(userName)){
+                        pwi.setUsername(lastTextElement);
+                    }
+                    else if(name.equals(password)){
+                        //13.01.2015 19:20 Lukas: Entschlüsselung des Passwortes
+                        String decryptedTextString = "";
+                        try {
+                            Cipher dec = getCipher(Cipher.DECRYPT_MODE, masterPw);
+                            byte decryptedText[] = dec.doFinal(lastTextElement.getBytes("UTF-8"));
+                            decryptedTextString = new String(decryptedText);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        pwi.setPassword(decryptedTextString);
+                    }
+                    else if(name.equals("loginData")){
+                        userData.add(pwi);
+                    }
+                    break;
             }
             try {
                 eventType = xpp.next();
@@ -178,5 +215,22 @@ public class XMLParser {
         }
 
         return userData;
+    }
+
+    private static Cipher getCipher(final int opmode, String key) throws GeneralSecurityException {
+        assert opmode == Cipher.ENCRYPT_MODE || opmode == Cipher.DECRYPT_MODE;
+        assert key != null;
+        Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
+
+        while(key.getBytes().length < 128){
+            key = key + key;
+        }
+
+        cipher.init(
+                opmode,
+                SecretKeyFactory.getInstance("DES").generateSecret(new DESKeySpec(key.getBytes())),
+                new IvParameterSpec(new byte[] { 0x10, 0x10, 0x01, 0x04, 0x01, 0x01, 0x01, 0x02 } )
+        );
+        return cipher;
     }
 }

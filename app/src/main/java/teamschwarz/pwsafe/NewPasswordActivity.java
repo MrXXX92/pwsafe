@@ -1,12 +1,14 @@
 package teamschwarz.pwsafe;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,29 +17,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.util.EncodingUtils;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
-
-import static teamschwarz.pwsafe.MainActivity.CURRENT_MPW;
-
+import java.util.Random;
 
 public class NewPasswordActivity extends Activity {
 
     EditText newDescription;
+    EditText newUsername;
     EditText newPassword;
     Button saveButton;
-    List<PasswordItem> passwords = new ArrayList<PasswordItem>();
-    int position = -1;
+    Button copyButton;
+    Button generateButton;
+    String masterPassword;
+
+    public String getMasterPassword() {
+        return masterPassword;
+    }
+
+    public void setMasterPassword(final String masterPassword){
+        this.masterPassword = masterPassword;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +49,9 @@ public class NewPasswordActivity extends Activity {
         //Aufruf verarbeiten
         Intent intent = getIntent();
         String title = intent.getStringExtra("title");
+        setMasterPassword(intent.getStringExtra("mpw"));
         String description = intent.getStringExtra("description");
+        String username = intent.getStringExtra("username");
         String password = intent.getStringExtra("password");
         final int position = intent.getIntExtra("position", -1);
 
@@ -64,18 +65,43 @@ public class NewPasswordActivity extends Activity {
             newDescription.setText(description);
         }
 
+        newUsername = (EditText) findViewById(R.id.editTextNewUsername);
+        //falls ein Username übergeben wurde, diesen auch anzeigen
+        if (username != null && !username.isEmpty()) {
+            newUsername.setText(username);
+        }
+
         newPassword = (EditText) findViewById(R.id.editTextNewPassword);
-        //falls ein Passwort übergeben wurde, diese auch anzeigen
+        //falls ein Passwort übergeben wurde, dieses auch anzeigen
         if (password != null && !password.isEmpty()) {
             newPassword.setText(password);
         }
 
-        //Save-Button Detail-Maske initial klickbar
+        //Save- und Copy-Button in Detail-Maske initial klickbar
         saveButton = (Button) findViewById(R.id.buttonSave);
         saveButton.setEnabled(isValidPasswordItem());
+        copyButton = (Button) findViewById(R.id.buttonCopy);
+        copyButton.setEnabled(isPasswordFilled());
 
+        generateButton = (Button) findViewById(R.id.buttonGenerate);
 
         newDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Button nur klickbar, wenn das eingegebene Passwort valide ist
+                saveButton.setEnabled(isValidPasswordItem());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        newUsername.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -98,7 +124,9 @@ public class NewPasswordActivity extends Activity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Buttons nur klickbar, wenn das eingegebene Passwort valide ist
                 saveButton.setEnabled(isValidPasswordItem());
+                copyButton.setEnabled(isPasswordFilled());
             }
 
             @Override
@@ -110,35 +138,20 @@ public class NewPasswordActivity extends Activity {
             @Override
             public void onClick(View v) {
                 PasswordItem currentItem = new PasswordItem(newDescription.getText().toString(),
-                        "ToDo: Hier den Usernamen aus dem zu erstellenden Edit Feld einfügen",
+                        newUsername.getText().toString(),
                         newPassword.getText().toString());
 
-                if (position == -1l){
+                if (position == -1l) {
+
+
+
                     //Keine Position übergeben -> neues Passwort
                     // hinzufügen
-                    try {
-                        Cipher cipher = Cipher.getInstance("AES");
-                        SecretKeySpec spec = new SecretKeySpec(CURRENT_MPW.getBytes(), "AES");
-                        cipher.init(Cipher.ENCRYPT_MODE, spec);
-                        currentItem.setPassword(cipher.doFinal(currentItem.getPassword().getBytes()).toString());
-                    } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchPaddingException e) {
-                        e.printStackTrace();
-                    } catch (InvalidKeyException e) {
-                        e.printStackTrace();
-                    } catch (BadPaddingException e) {
-                        e.printStackTrace();
-                    } catch (IllegalBlockSizeException e) {
-                        e.printStackTrace();
-                    }
 
                     PasswordlistActivity.passwords.add(currentItem);
                     //Felder leeren
                     newDescription.setText("");
-
-                    //ToDo: Feld für Username ebenfalls leeren
-
+                    newUsername.setText("");
                     newPassword.setText("");
                     Toast.makeText(getApplicationContext(), R.string.password_added, Toast.LENGTH_SHORT).show();
                 } else {
@@ -146,26 +159,54 @@ public class NewPasswordActivity extends Activity {
                     // eingegebene Werte speichern
                     PasswordItem listItem = PasswordlistActivity.passwords.get(position);
                     listItem.setDescription(currentItem.getDescription());
-                    listItem.setDescription(currentItem.getUsername());
+                    listItem.setUsername(currentItem.getUsername());
                     listItem.setPassword(currentItem.getPassword());
                     //Felder leeren
                     newDescription.setText("");
-
-                    //ToDo: Feld für Username ebenfalls leeren
-
+                    newUsername.setText("");
                     newPassword.setText("");
                     Toast.makeText(getApplicationContext(), R.string.password_updated, Toast.LENGTH_SHORT).show();
                 }
 
                 //Der Einfachheit halber wird die XML-Datei bei jedem neuen Passwort komplett neu geschrieben
-                XMLParser.writeXML(PasswordlistActivity.passwords);
+                System.out.println("Masterpasswort: " + getMasterPassword());
+                if (!XMLParser.writeXML(PasswordlistActivity.passwords, getMasterPassword())) {
+                    Toast.makeText(getApplicationContext(), "Could not write file to external storage", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        copyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Aktuell eingegebenes Passwort kopieren
+                String password = newPassword.getText().toString();
+
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("password", password);
+                clipboard.setPrimaryClip(clip);
+            }
+        });
+
+        generateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String randomPassword = generateRandomPassword(16);
+                newPassword.setText(randomPassword);
+                Toast.makeText(getApplicationContext(), "New password: " + randomPassword, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+
     private boolean isValidPasswordItem() {
         return (String.valueOf(newDescription.getText()).trim().length() > 0) &&
+                (String.valueOf(newUsername.getText()).trim().length() > 0)&&
                 (String.valueOf(newPassword.getText()).trim().length() > 0);
+    }
+
+    private boolean isPasswordFilled() {
+        return (String.valueOf(newPassword.getText()).trim().length() > 0);
     }
 
     @Override
@@ -197,5 +238,52 @@ public class NewPasswordActivity extends Activity {
         //neue Aktivität für Settings öffnen
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+    }
+
+    private String generateRandomPassword(int passwordLength){
+        //Arrays mit erlaubten Zeichen anlegen
+        int [] validCharacters = new int[52];
+        int [] validDigits = new int [10];
+
+        //Arrays mit den erlaubten Zeichen befüllen (ASCII-Code)
+        int [] validSpecialSigns = {33,35,36,37,38,63};
+
+        for (int i = 0; i < validCharacters.length; i++){
+            //Großbuchstaben
+            if (i < 26){
+                validCharacters[i] = i + 65;
+            }
+            //Kleinbuchstaben
+            else{
+                validCharacters[i] = i + 71;
+            }
+        }
+
+        for (int i = 0; i < validDigits.length; i++){
+            validDigits[i] = i + 48;
+        }
+
+        String password = "";
+        Random random = new Random();
+        for (int i = 0; i < passwordLength; i++){
+            int randomSignType = random.nextInt(3);
+            int randomIndex = 0;
+            switch(randomSignType){
+                case 0:
+                    randomIndex = random.nextInt(validCharacters.length);
+                    password += (char) validCharacters[randomIndex];
+                    break;
+                case 1:
+                    randomIndex = random.nextInt(validDigits.length);
+                    password += (char) validDigits[randomIndex];
+                    break;
+                case 2:
+                    randomIndex = random.nextInt(validSpecialSigns.length);
+                    password += (char) validSpecialSigns[randomIndex];
+                    break;
+            }
+        }
+
+        return password;
     }
 }

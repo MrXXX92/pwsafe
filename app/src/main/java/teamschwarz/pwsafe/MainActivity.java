@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
     EditText masterPassword;
     Button accessButton;
 
-    public final static String CURRENT_MPW = "teamschwarz.pwsafe.MPW";
+    public static String CURRENT_MPW = "teamschwarz.pwsafe.MPW";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +51,9 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent(MainActivity.this, PasswordlistActivity.class);
 
                 //Passwort Liste mit den Werten aus der XML-Datei befüllen
-                PasswordlistActivity.passwords = XMLParser.readXML();
+                PasswordlistActivity.passwords = XMLParser.readXML(password);
 
-                intent.putExtra(CURRENT_MPW, password);
+                intent.putExtra("CURRENT_MPW", password);
                 // TODO hier muss man sich das eingegebene MasterPasswort ggf. anders merken,
                 // um es später abgleichen & benutzen zu können
                 startActivity(intent);
