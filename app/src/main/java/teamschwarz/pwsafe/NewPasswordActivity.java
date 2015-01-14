@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +38,9 @@ public class NewPasswordActivity extends Activity {
     public void setMasterPassword(final String masterPassword){
         this.masterPassword = masterPassword;
     }
+
+    Button showButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +88,8 @@ public class NewPasswordActivity extends Activity {
         copyButton.setEnabled(isPasswordFilled());
 
         generateButton = (Button) findViewById(R.id.buttonGenerate);
+        showButton = (Button) findViewById(R.id.buttonShow);
+        showButton.setText("Show password");
 
         newDescription.addTextChangedListener(new TextWatcher() {
             @Override
@@ -194,6 +200,23 @@ public class NewPasswordActivity extends Activity {
                 String randomPassword = generateRandomPassword(16);
                 newPassword.setText(randomPassword);
                 Toast.makeText(getApplicationContext(), "New password: " + randomPassword, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        showButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if (showButton.getText() == "Show password") {
+                    newPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    showButton.setText("Hide password");
+                }
+                else {
+                    newPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    showButton.setText("Show password");
+                }
+
             }
         });
     }
