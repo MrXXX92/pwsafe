@@ -306,7 +306,6 @@ public class NewPasswordActivity extends Activity {
                     break;
             }
         }
-
         return password;
     }
 }
