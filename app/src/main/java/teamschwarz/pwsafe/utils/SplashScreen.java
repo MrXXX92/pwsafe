@@ -1,11 +1,14 @@
 /**
  * Created by soch on 09.01.2015.
  */
-package teamschwarz.pwsafe;
+package teamschwarz.pwsafe.utils;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import teamschwarz.pwsafe.R;
+import teamschwarz.pwsafe.activities.MainActivity;
 
 public class SplashScreen extends Activity {
 

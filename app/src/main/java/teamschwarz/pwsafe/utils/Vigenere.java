@@ -1,4 +1,4 @@
-package teamschwarz.pwsafe;
+package teamschwarz.pwsafe.utils;
 
 /**
  * Created by lhu on 16.01.2015.
@@ -36,5 +36,4 @@ public class Vigenere {
         }
         return out.toString();
     }
-
 }

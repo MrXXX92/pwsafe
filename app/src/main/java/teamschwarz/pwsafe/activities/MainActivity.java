@@ -1,4 +1,4 @@
-package teamschwarz.pwsafe;
+package teamschwarz.pwsafe.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,9 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import teamschwarz.pwsafe.R;
+import teamschwarz.pwsafe.utils.XMLParser;
 
 public class MainActivity extends Activity {
 

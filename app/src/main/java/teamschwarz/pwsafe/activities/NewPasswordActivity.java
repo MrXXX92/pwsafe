@@ -1,4 +1,4 @@
-package teamschwarz.pwsafe;
+package teamschwarz.pwsafe.activities;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -20,6 +20,10 @@ import android.widget.Toast;
 
 
 import java.util.Random;
+
+import teamschwarz.pwsafe.utils.PasswordItem;
+import teamschwarz.pwsafe.R;
+import teamschwarz.pwsafe.utils.XMLParser;
 
 public class NewPasswordActivity extends Activity {
 

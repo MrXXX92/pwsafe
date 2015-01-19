@@ -1,4 +1,4 @@
-package teamschwarz.pwsafe;
+package teamschwarz.pwsafe.utils;
 
 /**
  * Created by Mitsch on 28.11.14.

@@ -1,4 +1,4 @@
-package teamschwarz.pwsafe;
+package teamschwarz.pwsafe.utils;
 
 import android.os.Environment;
 import android.util.Xml;
@@ -68,10 +68,7 @@ public class XMLParser {
                 xmlSerializer.endTag(null, userName);
                 xmlSerializer.startTag(null, password);
                 //13.01.2015 19:20 Lukas: Verschlüsselung des Passwortes
-                System.out.println("Masterpasswort: " + masterpw);
-                System.out.println("Entschlüsselt: " + passwords.get(i).getPassword());
                 xmlSerializer.text(Vigenere.verschluesseln(passwords.get(i).getPassword().toCharArray(), masterpw.toCharArray()));
-                System.out.println("Verschlüsselt: " + Vigenere.verschluesseln(passwords.get(i).getPassword().toCharArray(), masterpw.toCharArray()));
                 xmlSerializer.endTag(null, password);
                 xmlSerializer.endTag(null, "loginData");
             }

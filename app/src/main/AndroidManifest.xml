@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="teamschwarz.pwsafe.SplashScreen"
+            android:name=".utils.SplashScreen"
             android:label="PWSafe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -16,39 +16,39 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="teamschwarz.pwsafe.MainActivity"
+            android:name=".activities.MainActivity"
             android:label="PWSafe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity
-            android:name="teamschwarz.pwsafe.PasswordlistActivity"
+            android:name=".activities.PasswordlistActivity"
             android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="teamschwarz.pwsafe.MainActivity" />
+                android:value=".activities.MainActivity" />
         </activity>
         <activity
-            android:name="teamschwarz.pwsafe.NewPasswordActivity"
+            android:name=".activities.NewPasswordActivity"
             android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="teamschwarz.pwsafe.PasswordlistActivity" />
+                android:value=".activities.PasswordlistActivity" />
         </activity>
         <activity
-            android:name="teamschwarz.pwsafe.SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="teamschwarz.pwsafe.PasswordlistActivity" />
+                android:value=".activities.PasswordlistActivity" />
         </activity>
         <activity
-            android:name=".NewMPwActivity"
+            android:name=".activities.NewMPwActivity"
             android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="teamschwarz.pwsafe.SettingsActivity" />
+                android:value=".activities.SettingsActivity" />
         </activity>
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>

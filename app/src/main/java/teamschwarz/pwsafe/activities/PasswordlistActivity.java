@@ -1,4 +1,4 @@
-package teamschwarz.pwsafe;
+package teamschwarz.pwsafe.activities;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -14,6 +14,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import teamschwarz.pwsafe.utils.PasswordItem;
+import teamschwarz.pwsafe.R;
 
 
 public class PasswordlistActivity extends ListActivity {
