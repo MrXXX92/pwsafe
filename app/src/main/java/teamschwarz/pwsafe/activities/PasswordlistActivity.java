@@ -55,13 +55,6 @@ public class PasswordlistActivity extends ListActivity {
     private void populatePasswordList() {
         ArrayAdapter<PasswordItem> PasswordAdapter = new PasswordListAdapter();
         passwordsListView.setAdapter(PasswordAdapter);
-
-        //initial Testdaten einfügen
-        if (passwords.isEmpty()) {
-            passwords.add(new PasswordItem("testPW1", "DummyUser1", "pw1"));
-            passwords.add(new PasswordItem("testPW2", "DummyUser2", "pw2"));
-            passwords.add(new PasswordItem("testPW3", "DummyUser3", "pw3"));
-        }
     }
 
     private class PasswordListAdapter extends ArrayAdapter<PasswordItem> {
@@ -145,6 +138,7 @@ public class PasswordlistActivity extends ListActivity {
     private void openSettings() {
         //neue Aktivität für Settings öffnen
         Intent intent = new Intent(this, SettingsActivity.class);
+        intent.putExtra("mpw", getMpw());
         startActivity(intent);
     }
 

@@ -179,7 +179,6 @@ public class NewPasswordActivity extends Activity {
                 }
 
                 //Der Einfachheit halber wird die XML-Datei bei jedem neuen Passwort komplett neu geschrieben
-                System.out.println("Masterpasswort: " + getMasterPassword());
                 if (!XMLParser.writeXML(PasswordlistActivity.passwords, getMasterPassword())) {
                     Toast.makeText(getApplicationContext(), "Could not write file to external storage", Toast.LENGTH_SHORT).show();
                 }
@@ -195,6 +194,7 @@ public class NewPasswordActivity extends Activity {
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("password", password);
                 clipboard.setPrimaryClip(clip);
+                Toast.makeText(getApplicationContext(), "Password was copied to your clipboard", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -264,6 +264,7 @@ public class NewPasswordActivity extends Activity {
     private void openSettings() {
         //neue Aktivität für Settings öffnen
         Intent intent = new Intent(this, SettingsActivity.class);
+        intent.putExtra("mpw", getMasterPassword());
         startActivity(intent);
     }
 

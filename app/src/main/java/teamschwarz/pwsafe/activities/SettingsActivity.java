@@ -12,6 +12,16 @@ import teamschwarz.pwsafe.R;
 
 public class SettingsActivity extends Activity {
 
+    String masterPassword;
+
+    public String getMasterPassword() {
+        return masterPassword;
+    }
+
+    public void setMasterPassword(final String masterPassword){
+        this.masterPassword = masterPassword;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,11 +29,16 @@ public class SettingsActivity extends Activity {
 
         // Zurück-Button aktivieren
         getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Aufruf verarbeiten
+        Intent intent = getIntent();
+        setMasterPassword(intent.getStringExtra("mpw"));
     }
 
     public void openMPWPopup(View view) {
         //neue Aktivität für neues MasterPassword öffnen
         Intent intent = new Intent(this, NewMPwActivity.class);
+        intent.putExtra("mpw", getMasterPassword());
         startActivity(intent);
     }
 

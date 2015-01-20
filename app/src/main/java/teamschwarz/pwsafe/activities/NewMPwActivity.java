@@ -12,14 +12,28 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.List;
+
 import teamschwarz.pwsafe.R;
+import teamschwarz.pwsafe.utils.PasswordItem;
+import teamschwarz.pwsafe.utils.XMLParser;
 
 
 public class NewMPwActivity extends Activity {
 
-    private EditText masterPassword1;
+    String masterPassword;
+
+    public String getMasterPassword() {
+        return masterPassword;
+    }
+
+    public void setMasterPassword(final String masterPassword){
+        this.masterPassword = masterPassword;
+    }
+
+    private EditText newMasterPassword;
+    private EditText newMasterPasswordRepetition;
     private Button saveButton;
-    private EditText masterPassword2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +43,12 @@ public class NewMPwActivity extends Activity {
         // Zurück-Button aktivieren
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        masterPassword1 = (EditText) findViewById(R.id.editTextNew1);
-        masterPassword1.addTextChangedListener(new TextWatcher() {
+        //Aufruf verarbeiten
+        Intent intent = getIntent();
+        setMasterPassword(intent.getStringExtra("mpw"));
+
+        newMasterPassword = (EditText) findViewById(R.id.editTextNew1);
+        newMasterPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -46,8 +64,8 @@ public class NewMPwActivity extends Activity {
             }
         });
 
-        masterPassword2 = (EditText) findViewById(R.id.editTextNew2);
-        masterPassword2.addTextChangedListener(new TextWatcher() {
+        newMasterPasswordRepetition = (EditText) findViewById(R.id.editTextNew2);
+        newMasterPasswordRepetition.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -66,17 +84,30 @@ public class NewMPwActivity extends Activity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO Masterpasswort ändern
-                masterPassword1.setText("");
-                masterPassword2.setText("");
+
+                //Activity zum Anzeigen der Passwörter öffnen
+                Intent intent = new Intent(NewMPwActivity.this, PasswordlistActivity.class);
+
+                //XML-Datei mit dem alten Master Passwort auslesen
+                PasswordlistActivity.passwords = XMLParser.readXML(getMasterPassword());
+                //XML-Datei mit dem neuen Master Passwort schreiben
+                if (!XMLParser.writeXML(PasswordlistActivity.passwords, newMasterPassword.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "Could not write file to external storage", Toast.LENGTH_SHORT).show();
+                }
+
+                newMasterPassword.setText("");
+                newMasterPasswordRepetition.setText("");
                 Toast.makeText(getApplicationContext(), R.string.mpwUpdated, Toast.LENGTH_SHORT).show();
+
+                intent.putExtra("CURRENT_MPW", newMasterPassword.getText().toString());
+                startActivity(intent);
             }
         });
     }
 
     private boolean isValidPasswordItem() {
-        String new1 = String.valueOf(masterPassword1.getText());
-        String new2 = String.valueOf(masterPassword2.getText());
+        String new1 = String.valueOf(newMasterPassword.getText());
+        String new2 = String.valueOf(newMasterPasswordRepetition.getText());
 
         //Valide, wenn die beiden Passwörter gleich und nicht leer sind
         return (new1.equals(new2) &&
