@@ -1,9 +1,13 @@
 package teamschwarz.pwsafe.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -32,19 +36,20 @@ public class NewPasswordActivity extends Activity {
     EditText newPassword;
     Button saveButton;
     Button copyButton;
+    Button showButton;
     Button generateButton;
+    Button deleteButton;
     String masterPassword;
+    DeleteDialogFragment deleteFragment;
+    private int position;
 
     public String getMasterPassword() {
         return masterPassword;
     }
 
-    public void setMasterPassword(final String masterPassword){
+    public void setMasterPassword(final String masterPassword) {
         this.masterPassword = masterPassword;
     }
-
-    Button showButton;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +66,7 @@ public class NewPasswordActivity extends Activity {
         String description = intent.getStringExtra("description");
         String username = intent.getStringExtra("username");
         String password = intent.getStringExtra("password");
-        final int position = intent.getIntExtra("position", -1);
+        position = intent.getIntExtra("position", -1);
 
         //Titel je nach Aufruf setzen (Neu oder Detail-Ansicht)
         TextView titleView = (TextView) findViewById(R.id.textViewDetailTitle);
@@ -94,6 +99,14 @@ public class NewPasswordActivity extends Activity {
         generateButton = (Button) findViewById(R.id.buttonGenerate);
         showButton = (Button) findViewById(R.id.buttonShow);
         showButton.setText("Show password");
+        deleteButton = (Button) findViewById(R.id.buttonDelete);
+
+        //DeleteButton initial nur bei gespeichertem PW sichtbar
+        if (position != -1l) {
+            deleteButton.setEnabled(true);
+        }
+
+        deleteFragment = new DeleteDialogFragment();
 
         newDescription.addTextChangedListener(new TextWatcher() {
             @Override
@@ -153,8 +166,6 @@ public class NewPasswordActivity extends Activity {
 
                 if (position == -1l) {
 
-
-
                     //Keine Position übergeben -> neues Passwort
                     // hinzufügen
 
@@ -178,10 +189,10 @@ public class NewPasswordActivity extends Activity {
                     Toast.makeText(getApplicationContext(), R.string.password_updated, Toast.LENGTH_SHORT).show();
                 }
 
-                //Der Einfachheit halber wird die XML-Datei bei jedem neuen Passwort komplett neu geschrieben
-                if (!XMLParser.writeXML(PasswordlistActivity.passwords, getMasterPassword())) {
-                    Toast.makeText(getApplicationContext(), "Could not write file to external storage", Toast.LENGTH_SHORT).show();
-                }
+                writePasswords();
+
+                //Delete-Button aktivieren
+                deleteButton.setEnabled(true);
             }
         });
 
@@ -194,7 +205,7 @@ public class NewPasswordActivity extends Activity {
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("password", password);
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(getApplicationContext(), "Password was copied to your clipboard", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.password_copied, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -210,30 +221,55 @@ public class NewPasswordActivity extends Activity {
         showButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 if (showButton.getText() == "Show password") {
                     newPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                     showButton.setText("Hide password");
-                }
-                else {
+                } else {
                     newPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     showButton.setText("Show password");
                 }
 
             }
         });
-    }
 
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteFragment.show(getFragmentManager(), "Delete");
+            }
+        });
+    }
 
     private boolean isValidPasswordItem() {
         return (String.valueOf(newDescription.getText()).trim().length() > 0) &&
-                (String.valueOf(newUsername.getText()).trim().length() > 0)&&
+                (String.valueOf(newUsername.getText()).trim().length() > 0) &&
                 (String.valueOf(newPassword.getText()).trim().length() > 0);
     }
 
     private boolean isPasswordFilled() {
         return (String.valueOf(newPassword.getText()).trim().length() > 0);
+    }
+
+    private void writePasswords(){
+        //Der Einfachheit halber wird die XML-Datei bei jedem neuen Passwort komplett neu geschrieben
+        if (!XMLParser.writeXML(PasswordlistActivity.passwords, getMasterPassword())) {
+            Toast.makeText(getApplicationContext(), "Could not write file to external storage", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void deletePassword(){
+        PasswordlistActivity.passwords.remove(position);
+        //Felder leeren
+        newDescription.setText("");
+        newUsername.setText("");
+        newPassword.setText("");
+        Toast.makeText(getApplicationContext(), R.string.password_deleted, Toast.LENGTH_SHORT).show();
+
+        writePasswords();
+
+        //Wieder in Passwortliste springen
+        Intent intent = new Intent(this, PasswordlistActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -268,35 +304,35 @@ public class NewPasswordActivity extends Activity {
         startActivity(intent);
     }
 
-    private String generateRandomPassword(int passwordLength){
+    private String generateRandomPassword(int passwordLength) {
         //Arrays mit erlaubten Zeichen anlegen
-        int [] validCharacters = new int[52];
-        int [] validDigits = new int [10];
+        int[] validCharacters = new int[52];
+        int[] validDigits = new int[10];
 
         //Arrays mit den erlaubten Zeichen befüllen (ASCII-Code)
-        int [] validSpecialSigns = {33,35,36,37,38,63};
+        int[] validSpecialSigns = {33, 35, 36, 37, 38, 63};
 
-        for (int i = 0; i < validCharacters.length; i++){
+        for (int i = 0; i < validCharacters.length; i++) {
             //Großbuchstaben
-            if (i < 26){
+            if (i < 26) {
                 validCharacters[i] = i + 65;
             }
             //Kleinbuchstaben
-            else{
+            else {
                 validCharacters[i] = i + 71;
             }
         }
 
-        for (int i = 0; i < validDigits.length; i++){
+        for (int i = 0; i < validDigits.length; i++) {
             validDigits[i] = i + 48;
         }
 
         String password = "";
         Random random = new Random();
-        for (int i = 0; i < passwordLength; i++){
+        for (int i = 0; i < passwordLength; i++) {
             int randomSignType = random.nextInt(3);
             int randomIndex = 0;
-            switch(randomSignType){
+            switch (randomSignType) {
                 case 0:
                     randomIndex = random.nextInt(validCharacters.length);
                     password += (char) validCharacters[randomIndex];
@@ -312,5 +348,27 @@ public class NewPasswordActivity extends Activity {
             }
         }
         return password;
+    }
+
+    public static class DeleteDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("Delete password?")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // DELETE
+                            ((NewPasswordActivity) getActivity()).deletePassword();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
     }
 }

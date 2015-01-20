@@ -12,6 +12,8 @@
     <string name="password">Password</string>
     <string name="passswordListTitle">Saved Passwords</string>
     <string name="password_added">New Password has been added</string>
+    <string name="password_copied">Password has been copied to your clipboard</string>
+    <string name="password_deleted">Password has been deleted</string>
     <string name="password_updated">Password has been updated</string>
     <string name="quality">Quality:</string>
     <string name="settings">Settings</string>
