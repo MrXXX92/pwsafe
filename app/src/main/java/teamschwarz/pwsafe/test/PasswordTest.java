@@ -5,7 +5,7 @@ import android.test.InstrumentationTestCase;
 import teamschwarz.pwsafe.utils.Vigenere;
 
 /**
- * Created by UNI on 19.01.2015.
+ * Created by Lukas on 19.01.2015.
  */
 public class PasswordTest extends InstrumentationTestCase{
 

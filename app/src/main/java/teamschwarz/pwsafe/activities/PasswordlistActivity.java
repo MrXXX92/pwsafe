@@ -40,7 +40,7 @@ public class PasswordlistActivity extends ListActivity {
 
         //Aufruf verarbeiten
         Intent intent = getIntent();
-        setMpw(intent.getStringExtra("CURRENT_MPW"));
+        setMpw(intent.getStringExtra("mpw"));
         // TODO hier kann man dann was mit dem eingegebenen MasterPasswort machen
 
         // Zurück-Button aktivieren

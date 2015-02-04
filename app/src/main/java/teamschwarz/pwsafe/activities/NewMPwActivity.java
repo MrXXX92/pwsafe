@@ -90,8 +90,12 @@ public class NewMPwActivity extends Activity {
 
                 //XML-Datei mit dem alten Master Passwort auslesen
                 PasswordlistActivity.passwords = XMLParser.readXML(getMasterPassword());
+
+                //Masterpasswort speichern
+                setMasterPassword(newMasterPassword.getText().toString());
+
                 //XML-Datei mit dem neuen Master Passwort schreiben
-                if (!XMLParser.writeXML(PasswordlistActivity.passwords, newMasterPassword.getText().toString())) {
+                if (!XMLParser.writeXML(PasswordlistActivity.passwords, getMasterPassword())) {
                     Toast.makeText(getApplicationContext(), "Could not write file to external storage", Toast.LENGTH_SHORT).show();
                 }
 
@@ -99,7 +103,7 @@ public class NewMPwActivity extends Activity {
                 newMasterPasswordRepetition.setText("");
                 Toast.makeText(getApplicationContext(), R.string.mpwUpdated, Toast.LENGTH_SHORT).show();
 
-                intent.putExtra("CURRENT_MPW", newMasterPassword.getText().toString());
+                intent.putExtra("mpw", getMasterPassword());
                 startActivity(intent);
             }
         });

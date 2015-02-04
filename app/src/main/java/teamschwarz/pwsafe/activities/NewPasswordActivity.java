@@ -193,6 +193,8 @@ public class NewPasswordActivity extends Activity {
 
                 //Delete-Button aktivieren
                 deleteButton.setEnabled(true);
+
+                goToHome();
             }
         });
 
@@ -266,9 +268,15 @@ public class NewPasswordActivity extends Activity {
         Toast.makeText(getApplicationContext(), R.string.password_deleted, Toast.LENGTH_SHORT).show();
 
         writePasswords();
+        goToHome();
 
+
+    }
+
+    private void goToHome() {
         //Wieder in Passwortliste springen
         Intent intent = new Intent(this, PasswordlistActivity.class);
+        intent.putExtra("mpw", getMasterPassword());
         startActivity(intent);
     }
 
