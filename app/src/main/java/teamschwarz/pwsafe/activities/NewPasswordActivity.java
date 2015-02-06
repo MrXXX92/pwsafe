@@ -28,6 +28,7 @@ import java.util.Random;
 import teamschwarz.pwsafe.utils.PasswordItem;
 import teamschwarz.pwsafe.R;
 import teamschwarz.pwsafe.utils.XMLParser;
+import teamschwarz.pwsafe.utils.pwSafeApplication;
 
 public class NewPasswordActivity extends Activity {
 
@@ -39,17 +40,13 @@ public class NewPasswordActivity extends Activity {
     Button showButton;
     Button generateButton;
     Button deleteButton;
-    String masterPassword;
     DeleteDialogFragment deleteFragment;
     private int position;
 
     public String getMasterPassword() {
-        return masterPassword;
+        return ((pwSafeApplication)this.getApplication()).getMasterpw();
     }
 
-    public void setMasterPassword(final String masterPassword) {
-        this.masterPassword = masterPassword;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +59,6 @@ public class NewPasswordActivity extends Activity {
         //Aufruf verarbeiten
         Intent intent = getIntent();
         String title = intent.getStringExtra("title");
-        setMasterPassword(intent.getStringExtra("mpw"));
         String description = intent.getStringExtra("description");
         String username = intent.getStringExtra("username");
         String password = intent.getStringExtra("password");
@@ -276,7 +272,6 @@ public class NewPasswordActivity extends Activity {
     private void goToHome() {
         //Wieder in Passwortliste springen
         Intent intent = new Intent(this, PasswordlistActivity.class);
-        intent.putExtra("mpw", getMasterPassword());
         startActivity(intent);
     }
 
@@ -308,7 +303,6 @@ public class NewPasswordActivity extends Activity {
     private void openSettings() {
         //neue Aktivität für Settings öffnen
         Intent intent = new Intent(this, SettingsActivity.class);
-        intent.putExtra("mpw", getMasterPassword());
         startActivity(intent);
     }
 

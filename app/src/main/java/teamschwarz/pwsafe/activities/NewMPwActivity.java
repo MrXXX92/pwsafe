@@ -17,18 +17,17 @@ import java.util.List;
 import teamschwarz.pwsafe.R;
 import teamschwarz.pwsafe.utils.PasswordItem;
 import teamschwarz.pwsafe.utils.XMLParser;
+import teamschwarz.pwsafe.utils.pwSafeApplication;
 
 
 public class NewMPwActivity extends Activity {
 
-    String masterPassword;
-
     public String getMasterPassword() {
-        return masterPassword;
+        return ((pwSafeApplication)this.getApplication()).getMasterpw();
     }
 
-    public void setMasterPassword(final String masterPassword){
-        this.masterPassword = masterPassword;
+    public void setMasterPassword(final String master){
+        ((pwSafeApplication)this.getApplication()).setMasterpw(master);
     }
 
     private EditText newMasterPassword;
@@ -45,7 +44,6 @@ public class NewMPwActivity extends Activity {
 
         //Aufruf verarbeiten
         Intent intent = getIntent();
-        setMasterPassword(intent.getStringExtra("mpw"));
 
         newMasterPassword = (EditText) findViewById(R.id.editTextNew1);
         newMasterPassword.addTextChangedListener(new TextWatcher() {
@@ -103,7 +101,6 @@ public class NewMPwActivity extends Activity {
                 newMasterPasswordRepetition.setText("");
                 Toast.makeText(getApplicationContext(), R.string.mpwUpdated, Toast.LENGTH_SHORT).show();
 
-                intent.putExtra("mpw", getMasterPassword());
                 startActivity(intent);
             }
         });

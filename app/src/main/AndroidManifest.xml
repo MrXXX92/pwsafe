@@ -3,6 +3,7 @@
     package="teamschwarz.pwsafe" >
 
     <application
+        android:name=".utils.pwSafeApplication"
         android:allowBackup="true"
         android:icon="@drawable/icon_launcher"
         android:label="@string/app_name"

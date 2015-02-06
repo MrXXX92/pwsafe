@@ -11,13 +11,16 @@ import android.widget.EditText;
 
 import teamschwarz.pwsafe.R;
 import teamschwarz.pwsafe.utils.XMLParser;
+import teamschwarz.pwsafe.utils.pwSafeApplication;
 
 public class MainActivity extends Activity {
 
     EditText masterPassword;
     Button accessButton;
 
-    public static String CURRENT_MPW = "teamschwarz.pwsafe.MPW";
+    private void setMaster(final String masterPw){
+        ((pwSafeApplication)this.getApplication()).setMasterpw(masterPw);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +58,7 @@ public class MainActivity extends Activity {
 
                 //Passwort Liste mit den Werten aus der XML-Datei befüllen
                 PasswordlistActivity.passwords = XMLParser.readXML(password);
-
-                intent.putExtra("mpw", password);
-                // TODO hier muss man sich das eingegebene MasterPasswort ggf. anders merken,
-                // um es später abgleichen & benutzen zu können
+                setMaster(password);
                 startActivity(intent);
             }
         });
