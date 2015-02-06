@@ -7,7 +7,8 @@
     <string name="detailTitle">New Password</string>
     <string name="enter_master_password">Enter your master password</string>
     <string name="mpwUpdated">Your master password has been updated</string>
-    <string name="newMPW">new:</string>
+    <string name="newMPW">New password:</string>
+    <string name="newMPWRepeat">Repeat password:</string>
     <string name="newMPWTitle">Enter a new master password</string>
     <string name="password">Password</string>
     <string name="passwordListTitle">Saved Passwords</string>
