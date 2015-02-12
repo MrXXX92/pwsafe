@@ -10,6 +10,13 @@ public class Vigenere {
 
         for(int i = 0; i < plain.length; i++){
             int result = (plain[i] + key[i % key.length])%128;
+
+            //Es werden nur druckbare Zeichen (keine Steuerzeichen) verwendet
+            if (result < 32)
+            {
+                result += 32;
+            }
+
             output[i] = (char) result;
         }
         StringBuffer out = new StringBuffer();
@@ -28,6 +35,13 @@ public class Vigenere {
             }else{
                 result = (text[i] - key[i % key.length]) % 128;
             }
+
+            //Es werden nur druckbare Zeichen (keine Steuerzeichen) verwendet
+            if (result < 32)
+            {
+                result += 32;
+            }
+
             output[i] = (char) result;
         }
         StringBuffer out = new StringBuffer();
