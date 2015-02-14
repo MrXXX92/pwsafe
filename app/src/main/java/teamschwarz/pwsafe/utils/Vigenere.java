@@ -39,7 +39,7 @@ public class Vigenere {
             //Es werden nur druckbare Zeichen (keine Steuerzeichen) verwendet
             if (result < 32)
             {
-                result += 32;
+                result += 96;
             }
 
             output[i] = (char) result;
